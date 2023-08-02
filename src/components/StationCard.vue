@@ -23,8 +23,8 @@
             <q-btn class="q-mx-md" flat color="primary" icon="my_location" />
             <span class="text-primary"><strong>Estatus:</strong></span>
             
-            <q-btn flat color="green" icon="lens"></q-btn>
-            <q-btn flat color="primary">
+            <q-btn flat :color="statusColor" icon="lens"></q-btn>
+            <q-btn flat color="primary" @click="onShow">
               Ver
             </q-btn>
           </q-card-actions>
@@ -34,9 +34,40 @@
 </template>
 
 <script setup>
+  import { ref } from 'vue';
 
-    const title = "Estación Rada"
-    const description = "Descripción de la estación"
+  const statusColor = ref('')
+
+  const props = defineProps({
+    id: {
+      default: '',
+      type: String,
+      required: true
+    },
+    title: {
+      default: '',
+      type: String,
+      required: true
+    },
+    description: {
+      default: '',
+      type: String,
+      required: true
+    },
+    status: {
+      default: false,
+      type: Boolean,
+      required: true
+    }
+  })
+    
+  const onShow = async() => {
+  }
+
+  statusColor.value = props.status ? 'green' : 'red'
+
+
+
 
 </script>
 
