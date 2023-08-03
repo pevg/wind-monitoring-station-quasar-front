@@ -35,6 +35,9 @@
 
 <script setup>
   import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const statusColor = ref('')
 
@@ -58,10 +61,27 @@
       default: false,
       type: Boolean,
       required: true
+    },
+    location: {
+      default: '',
+      type: String,
+    },
+    publish_topic: {
+      default: '',
+      type: String,
+    },
+    subscription_topic: {
+      default: '',
+      type: String,
+    },
+    serverIP: {
+      default: '',
+      type: String,
     }
   })
     
-  const onShow = async() => {
+  const onShow = () => {
+    router.push({ path: `view/${props.id}` })
   }
 
   statusColor.value = props.status ? 'green' : 'red'

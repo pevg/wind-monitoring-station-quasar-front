@@ -87,8 +87,10 @@
                   </div>
                 </div>              
                 <div class="row q-mb-lg justify-center q-mt-xl">
-                  <q-btn label="Registrar" type="submit" color="primary"/>
-                  <q-btn label="Limpiar" type="reset" color="primary" flat class="q-ml-sm" />
+                  <q-btn label="Registrar" type="submit" color="primary" class="q-mr-md"/>
+                  <q-btn label="volver" type="button" color="secondary" @click="goBack()" class="q-mr-md"/>
+                  <q-btn v-if="props.type === 'edit'" label="Eliminar" type="button" color="negative" @click="deleteStation()"/>
+                  <q-btn v-if="props.type !== 'edit'" label="Limpiar" type="reset" color="primary" flat class="q-ml-sm" />
                 </div>
           
           </q-form>
@@ -98,10 +100,13 @@
 
 <script setup>
     import { ref, onBeforeMount } from 'vue';
-    import { useRouter } from 'vue-router';
+    import { useRouter, useRoute } from 'vue-router';
     import StationService from 'src/services/station';
 
+    const station = ref({})
+
     const router = useRouter();
+    const route = useRoute();
 
     const props = defineProps({
         title: {
@@ -113,8 +118,9 @@
             default: 'register',
             type: String
         },
-        station: {
-            default: {},
+        id: {
+            default: '',
+            type: String,
         }
     })
 
@@ -127,7 +133,9 @@
         publish_topic: ''
     })
     
-    onBeforeMount(() => {
+    onBeforeMount( async() => {
+        const response = await StationService.getStationById(route.params.id);
+        station.value = response.data;
         setInitValues()
     })
 
@@ -158,11 +166,24 @@
                 } 
                 break;
             case 'edit':
-                StationService.updateStation(formValues.value)
+                StationService.updateStation(station.value._id, formValues.value)
                 break;
         }
         
 
+    }
+
+    const goBack = ()=> {
+        router.go(-1)
+    }
+
+    const deleteStation = async() => {
+        if(!confirm('¿Esta seguro que desea eliminar esta estación?') ){
+            return
+        }else{
+            await StationService.deleteStation(station.value._id);
+            router.push('/');
+        }
     }
 
     const setInitValues = () => {
@@ -172,14 +193,13 @@
                 break;
             case 'edit':
                 formValues.value = {
-                    title: props.station.title,
-                    description: props.station.description,
-                    location: props.station.location,
-                    serverIP: props.station.serverIP,
-                    subscription_topic: props.station.subscription_topic,
-                    publish_topic: props.station.publish_topic
+                    title: station.value.title,
+                    description: station.value.description,
+                    location: station.value.location,
+                    serverIP: station.value.serverIP,
+                    subscription_topic: station.value.subscription_topic,
+                    publish_topic: station.value.publish_topic
                 }
-                break;
         }
     }
 
