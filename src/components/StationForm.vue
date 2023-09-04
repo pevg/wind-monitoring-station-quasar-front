@@ -166,7 +166,8 @@
                 } 
                 break;
             case 'edit':
-                StationService.updateStation(station.value._id, formValues.value)
+                await StationService.updateStation(station.value._id, formValues.value);
+                goBack();
                 break;
         }
         

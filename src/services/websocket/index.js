@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 
 class WebSocketService{
 
-    constructor(url){
+    constructor(url, subTopic, messageCallback){
         this.isConnected = ref(false);
         this.socketURL  = url;
         this.socket     = io(this.socketURL);
@@ -18,13 +18,11 @@ class WebSocketService{
             console.log('Conexión WebSocket desconectada');
         });
         // Escuchar eventos personalizados desde el servidor
-        this.socket.on('mensaje', (data) => {
-            console.log('Mensaje recibido:', data);
-        });
+        this.socket.on(subTopic, messageCallback);
     }
     // Método para enviar un mensaje al servidor a través del WebSocket
-    enviarMensaje(msg) {
-        this.socket.emit('message', msg);
+    enviarMensaje(category, msg) {
+        this.socket.emit(category, msg);
     };
     // Método para cerrar la conexión del WebSocket
     cerrarConexion() {

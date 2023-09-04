@@ -47,7 +47,7 @@
     import { useRoute, useRouter } from 'vue-router';
     import StationService from 'src/services/station';
     import WebSocketService from 'src/services/websocket';
-    const ws = new WebSocketService('ws://localhost:3000');
+    const ws = ref(null)
 
     const route = useRoute()
     const router = useRouter();
@@ -60,7 +60,15 @@
     onBeforeMount( async () => {
         const response = await StationService.getStationById(route.params.id);
         station.value = response.data;
+        ws.value = new WebSocketService('ws://localhost:3000', station.value.subscription_topic, messageCallback);
     })
+
+    const messageCallback = (data) => {
+        const message = JSON.parse(data);
+        message.velocity ? windProperties.value.velocity = message.velocity : "N/R"
+        message.direction ? windProperties.value.direction = message.direction : "N/R"
+        console.log(message);
+    }
 
     const editStation = () => {
         router.push({path: `/edit/${station.value._id}`})
@@ -72,7 +80,8 @@
             subscription_topic: station.value.subscription_topic,
             publish_topic: station.value.publish_topic
         }
-        ws.enviarMensaje(payload)
+        ws.value.enviarMensaje("config",payload)
+        station.value.status = true
     }
 
 </script>
